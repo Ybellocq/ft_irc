@@ -22,6 +22,9 @@ class Channel {
         static void createChannel(const std::string& name, Client* creator);
         void sendNumericResponse(Client* client, const std::string& code, const std::string& param1, const std::string& param2);
         void kick(Client* creator, const std::string& targetNickname);
+        void sendAll(const std::string& message);
+        void Channel::addUser(Client* user);
+        void Channel::removeUser(Client* user);
     private:
         std::string _name;
         std::string _password;

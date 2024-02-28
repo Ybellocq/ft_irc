@@ -47,6 +47,17 @@ void Channel::sendNumericResponse(Client* client, const std::string& code, const
     sendMessage(client, message);
 }
 
+void Channel::sendAll(const std::string& message){
+    for (std::map<std::string, Client*>::const_iterator it = _regulars.begin(); it != _regulars.end(); ++it)
+    {
+        sendMessage(it->second, message);
+    }
+
+    for (std::map<std::string, Client*>::const_iterator it = _operators.begin(); it != _operators.end(); ++it)
+    {
+        sendMessage(it->second, message);
+    }
+}
 
 void Channel::kick(Client* creator, const std::string& targetNickname){
     std::map<std::string, Client*>::iterator targetRegular = _regulars.find(targetNickname);
@@ -71,4 +82,14 @@ void Channel::kick(Client* creator, const std::string& targetNickname){
     {
         sendNumericResponse(creator, "482", creator->getNickname(), "");
     }
+}
+
+void Channel::addUser(Client* user) {
+    _regulars[user->getNickname()] = user;
+    _nUser++;
+}
+
+void Channel::removeUser(Client* user) {
+    _regulars.erase(user->getNickname());
+    _nUser--;
 }
