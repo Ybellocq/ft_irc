@@ -20,6 +20,8 @@ class Channel {
         const std::string &getName() const;
         static void sendMessage(Client* client, const std::string& msg);
         static void createChannel(const std::string& name, Client* creator);
+        void sendNumericResponse(Client* client, const std::string& code, const std::string& param1, const std::string& param2);
+        void kick(Client* creator, const std::string& targetNickname);
     private:
         std::string _name;
         std::string _password;

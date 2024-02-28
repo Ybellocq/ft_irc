@@ -36,3 +36,39 @@ const std::string& Channel::getName() const {
 Channel::~Channel(){
 
 }
+
+void Channel::sendNumericResponse(Client* client, const std::string& code, const std::string& param1, const std::string& param2){
+    std::string message = ":127.0.0.1 " + code + " " + param1 + " ";
+
+    if (!param2.empty()){
+        message += param2;
+    }
+    message += "\n";
+    sendMessage(client, message);
+}
+
+
+void Channel::kick(Client* creator, const std::string& targetNickname){
+    std::map<std::string, Client*>::iterator targetRegular = _regulars.find(targetNickname);
+    std::map<std::string, Client*>::iterator targetOperator = _operators.find(targetNickname);
+
+    if (targetRegular == _regulars.end())
+    {
+        sendNumericResponse(creator, "442", creator->getNickname(), _name);
+    }
+    else if (targetOperator != _operators.end())
+    {
+        sendMessage(creator, ":127.0.0.1 Error :You can't kick an operator\n");
+    }
+    else
+    {
+        std::string kickMessage = ":" + creator->getNickname() + "!~" + creator->getUsername() + "@127.0.0.1 KICK #" + _name + ' ' + targetRegular->second->getNickname() + " :\n";
+        sendAll(kickMessage);
+        _regulars.erase(targetRegular);
+    }
+
+    if (_operators.find(creator->getNickname()) == _operators.end())
+    {
+        sendNumericResponse(creator, "482", creator->getNickname(), "");
+    }
+}
