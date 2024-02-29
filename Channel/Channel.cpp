@@ -93,3 +93,26 @@ void Channel::removeUser(Client* user) {
     _regulars.erase(user->getNickname());
     _nUser--;
 }
+
+void Channel::invite(Client* sender, const std::string& targetNickname) {
+    // Vérifier si l'utilisateur qui envoie la commande INVITE est un opérateur du channel
+    if (_operators.find(sender->getNickname()) == _operators.end()) {
+        sendNumericResponse(sender, "482", sender->getNickname(), _name); // ERR_CHANOPRIVSNEEDED
+        return;
+    }
+
+    // Vérifier si l'utilisateur cible n'est pas déjà sur le channel
+    if (_regulars.find(targetNickname) != _regulars.end()) {
+        sendNumericResponse(sender, "443", sender->getNickname(), targetNickname); // ERR_USERONCHANNEL
+        return;
+    }
+
+    // Envoyer un message d'invitation au format approprié à l'utilisateur cible
+    Client* targetUser = findClientByNickname(targetNickname); // Vous devez implémenter cette fonction pour rechercher un client par son surnom
+    if (targetUser != nullptr) {
+        std::string inviteMessage = ":" + sender->getNickname() + " INVITE " + targetNickname + " :" + _name + "\n";
+        sendMessage(targetUser, inviteMessage);
+    } else {
+        sendNumericResponse(sender, "401", sender->getNickname(), targetNickname); // ERR_NOSUCHNICK
+    }
+}

@@ -23,8 +23,9 @@ class Channel {
         void sendNumericResponse(Client* client, const std::string& code, const std::string& param1, const std::string& param2);
         void kick(Client* creator, const std::string& targetNickname);
         void sendAll(const std::string& message);
-        void Channel::addUser(Client* user);
-        void Channel::removeUser(Client* user);
+        void addUser(Client* user);
+        void removeUser(Client* user);
+        void invite(Client* sender, const std::string& targetNickname);
     private:
         std::string _name;
         std::string _password;
